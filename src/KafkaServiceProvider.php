@@ -2,7 +2,6 @@
 
 namespace KafkaQueue;
 
-use App\Connector\KafkaConnector;
 use Illuminate\Support\ServiceProvider;
 
 class KafkaServiceProvider extends ServiceProvider
