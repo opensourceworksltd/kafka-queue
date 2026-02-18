@@ -8,27 +8,52 @@ class KafkaConnector implements ConnectorInterface
 {
     public function connect(array $config)
     {
-        $conf = new \RdKafka\Conf();
-        $conf->set("security.protocol", $config['security_protocol']);
-        $conf->set("sasl.mechanisms", $config['sasl_mechanisms']);
-        $conf->set("sasl.username", $config['sasl_username']);
-        $conf->set("sasl.password", $config['sasl_password']);
-        $conf->set(
+        // Configuration for both producer and consumer (common settings)
+        $baseConf = new \RdKafka\Conf();
+        $baseConf->set("security.protocol", $config['security_protocol']);
+        $baseConf->set("sasl.mechanisms", $config['sasl_mechanisms']);
+        $baseConf->set("sasl.username", $config['sasl_username']);
+        $baseConf->set("sasl.password", $config['sasl_password']);
+        $baseConf->set(
             'bootstrap.servers',
             $config['bootstrap_servers']
         );
-        $conf->set('ssl.ca.location', '/etc/ssl/cert.pem');
+        $baseConf->set('ssl.ca.location', '/etc/ssl/cert.pem');
 
-        $conf->set("group.id", $config['group_id']);
-        $conf->set("auto.offset.reset", "earliest");
-        
+        // Producer configuration (without consumer-specific properties)
+        $producerConf = new \RdKafka\Conf();
+        $producerConf->set("security.protocol", $config['security_protocol']);
+        $producerConf->set("sasl.mechanisms", $config['sasl_mechanisms']);
+        $producerConf->set("sasl.username", $config['sasl_username']);
+        $producerConf->set("sasl.password", $config['sasl_password']);
+        $producerConf->set(
+            'bootstrap.servers',
+            $config['bootstrap_servers']
+        );
+        $producerConf->set('ssl.ca.location', '/etc/ssl/cert.pem');
+
+        // Consumer configuration (with consumer-specific properties)
+        $consumerConf = new \RdKafka\Conf();
+        $consumerConf->set("security.protocol", $config['security_protocol']);
+        $consumerConf->set("sasl.mechanisms", $config['sasl_mechanisms']);
+        $consumerConf->set("sasl.username", $config['sasl_username']);
+        $consumerConf->set("sasl.password", $config['sasl_password']);
+        $consumerConf->set(
+            'bootstrap.servers',
+            $config['bootstrap_servers']
+        );
+        $consumerConf->set('ssl.ca.location', '/etc/ssl/cert.pem');
+
+        // Consumer-specific properties
+        $consumerConf->set("group.id", $config['group_id']);
+        $consumerConf->set("auto.offset.reset", "earliest");
+
         // create consumer
-        $consumer = new \RdKafka\KafkaConsumer($conf);
-        
- 
+        $consumer = new \RdKafka\KafkaConsumer($consumerConf);
 
-        $producer = new \RdKafka\Producer($conf);
-       
+        // create producer
+        $producer = new \RdKafka\Producer($producerConf);
+
 
         return new KafkaQueue($consumer, $producer);
     }

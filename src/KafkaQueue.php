@@ -20,7 +20,7 @@ class KafkaQueue extends Queue implements QueueContract
     public function pushRaw($payload, $queue = null, array $options = []) {}
     public function later($delay, $job, $data = "", $queue = null) {}
     public function pop($queue = null) {
-         $this->consumer->subscribe([$queue ?? env("KAFKA_TOPIC",'default')]);
+         $this->consumer->subscribe([$queue]);
 
           try {
             $message = $this->consumer->consume(120 * 1000);
