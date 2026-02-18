@@ -1,5 +1,5 @@
 {
-    "name": "mahmoud/kafka-queue",
+    "name": "opensourceworksltd/kafka-queue",
     "require": {
         "laravel/framework": "^12.51"
     },
